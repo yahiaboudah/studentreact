@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { fetchSpecialties } from '../api';
-import { Specialty } from '../types';
+import { fetchSpecs, updateSpec, deleteSpec, createSpec } from '../api';
+import { Spec } from '../types';
 import Layout from '../components/common/Layout';
 import SpecialtyTable from '../components/SpecialtyTable';
 import SpecialtyForm from '../components/specialties/SpecialtyForm';
+import toast, { Toaster } from 'react-hot-toast';
+
 
 export default function Specialties() {
-  const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [specialties, setSpecs] = useState<Spec[]>([]);
+  const [selectedSpec, setSelectedSpec] = useState<Spec | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -15,10 +18,11 @@ export default function Specialties() {
     loadSpecialties();
   }, []);
 
+  
   const loadSpecialties = async () => {
     try {
-      const data = await fetchSpecialties();
-      setSpecialties(data);
+      const data = await fetchSpecs();
+      setSpecs(data);
     } catch (err) {
       setError('Failed to load specialties');
     } finally {
@@ -26,13 +30,35 @@ export default function Specialties() {
     }
   };
 
-  const handleSubmit = async (specialtyData: Partial<Specialty>) => {
+  const handleSelectSpec = (spec: Spec) => {
+    setSelectedSpec(spec);
+    setShowForm(true);
+  };
+
+  const handleSubmit = async (specData: Partial<Spec>, createNew) => {
     try {
-      // Handle create/update logic here
-      await loadSpecialties();
-      setShowForm(false);
+      if(createNew) {
+        
+        const newSpec = await createSpec(specData);
+        setSpecs((prevSpecs) => [...prevSpecs, newSpec]);
+        setShowForm(false);
+        setSelectedSpec(null);
+        toast.success("Specialty added successfuly!");
+      }
+      else {
+        updateSpec(specData.id!, specData);
+        await setSpecs((prevSpecs) =>
+          prevSpecs.map((spec) =>
+            spec.id === specData.id ? { ...spec, ...specData } : spec
+          )
+        );
+        setShowForm(false);
+        setSelectedSpec(null);
+        toast.success("Specialty successfuly updated!"); 
+      }
     } catch (err) {
-      setError('Failed to save specialty');
+      toast.error("Failed to save specialty!");
+      setError('Failed to save specialty!');
     }
   };
 
@@ -41,7 +67,9 @@ export default function Specialties() {
 
   return (
     <Layout>
+      <Toaster/>
       <div className="space-y-6">
+
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-gray-900">Specialties</h1>
           <button
@@ -53,10 +81,18 @@ export default function Specialties() {
         </div>
 
         {showForm && (
-          <SpecialtyForm onSubmit={handleSubmit} />
+          <SpecialtyForm onSubmit={handleSubmit} initialData={selectedSpec || undefined} />
         )}
 
-        <SpecialtyTable specialties={specialties} />
+        <SpecialtyTable 
+            specs={specialties}
+            onSelectSpec={handleSelectSpec}
+            onDeleteSpec={(id)=>{
+              deleteSpec(id);
+              setSpecs((prevSpecs) => prevSpecs.filter((spec) => spec.id !== id));
+              toast.success("Specialty deleted successfuly!");
+            }}
+        />
       </div>
     </Layout>
   );

@@ -1,29 +1,30 @@
 import React, { useState } from 'react';
-import { Specialty } from '../../types';
+import { Spec } from '../../types';
 
 interface SpecialtyFormProps {
-  onSubmit: (specialty: Partial<Specialty>) => void;
-  initialData?: Specialty;
+  onSubmit: (spec: Partial<Spec>, createNew: boolean) => void;
+  initialData?: Spec;
 }
 
 export default function SpecialtyForm({ onSubmit, initialData }: SpecialtyFormProps) {
-  const [formData, setFormData] = useState<Partial<Specialty>>(
+  
+  const [formData, setFormData] = useState<Partial<Spec>>(
     initialData || {
       name: '',
-      availableSpots: 0
+      availablePlaces: 0
     }
   );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit(formData, initialData ? false: true);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'availableSpots' ? parseInt(value) : value
+      [name]: name === 'availablePlaces' ? parseInt(value) : value
     }));
   };
 
@@ -42,11 +43,11 @@ export default function SpecialtyForm({ onSubmit, initialData }: SpecialtyFormPr
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Available Spots</label>
+        <label className="block text-sm font-medium text-gray-700">Available Places</label>
         <input
           type="number"
-          name="availableSpots"
-          value={formData.availableSpots}
+          name="availablePlaces"
+          value={formData.availablePlaces}
           onChange={handleChange}
           min="0"
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"

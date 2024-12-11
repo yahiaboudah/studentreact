@@ -1,12 +1,10 @@
 import React from 'react';
 import { Student } from '../types';
-import { calculateOverallAverage } from '../utils/calculations';
 import { Pencil, Trash2 } from 'lucide-react';
 
 interface StudentTableProps {
   students: Student[];
   onSelectStudent: (student: Student) => void;
-  onUpdateStudent: (student: Student) => void;
   onDeleteStudent: (id: number) => void;
 }
 
@@ -26,6 +24,27 @@ export default function StudentTable({
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Name
             </th>
+            
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Average 1
+            </th>
+
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Average 2
+            </th>
+
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+               Average 3
+            </th>
+
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+               Average 4
+            </th>
+
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Choices
+            </th>
+
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Overall Average
             </th>
@@ -35,8 +54,8 @@ export default function StudentTable({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {students.map((student) => (
-            <tr key={student.id}>
+          {students.map((student, index) => (
+            <tr key={student.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
               <td className="px-6 py-4 whitespace-nowrap">
                 {student.studentNumber}
               </td>
@@ -44,12 +63,22 @@ export default function StudentTable({
                 {student.firstName} {student.lastName}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {calculateOverallAverage(
-                  student.average1,
-                  student.average2,
-                  student.average3,
-                  student.average4
-                ).toFixed(2)}
+                {student.semester1Avg}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {student.semester2Avg}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {student.semester3Avg}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {student.semester4Avg}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {student.choices?.join(' | ')}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {student.overallAverage}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex space-x-2">

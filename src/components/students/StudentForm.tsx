@@ -1,21 +1,25 @@
-import React, { useState } from 'react';
-import { Student } from '../../types';
+import React, { useEffect, useState } from 'react';
+import { Student, Spec } from '../../types';
+import { fetchSpecs } from '../../api';
 
 interface StudentFormProps {
   onSubmit: (student: Partial<Student>) => void;
+  specs: Spec[]
   initialData?: Student;
 }
 
-export default function StudentForm({ onSubmit, initialData }: StudentFormProps) {
+export default function StudentForm({ onSubmit, initialData, specs }: StudentFormProps) {
+  
   const [formData, setFormData] = useState<Partial<Student>>(
     initialData || {
       firstName: '',
       lastName: '',
       studentNumber: '',
-      average1: 0,
-      average2: 0,
-      average3: 0,
-      average4: 0,
+      semester1Avg: 0,
+      semester2Avg: 0,
+      semester3Avg: 0,
+      semester4Avg: 0,
+      choices: []
     }
   );
 
@@ -28,7 +32,16 @@ export default function StudentForm({ onSubmit, initialData }: StudentFormProps)
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name.includes('average') ? parseFloat(value) : value
+      [name]: name.includes('semester') ? parseFloat(value) : value
+    }));
+  };
+
+  const handleChoiceChange = (index: number, value: string) => {
+    const updatedChoices = [...(formData.choices || [])];
+    updatedChoices[index] = value;
+    setFormData(prev => ({
+      ...prev,
+      choices: updatedChoices
     }));
   };
 
@@ -77,8 +90,8 @@ export default function StudentForm({ onSubmit, initialData }: StudentFormProps)
             <label className="block text-sm font-medium text-gray-700">Average {num}</label>
             <input
               type="number"
-              name={`average${num}`}
-              value={formData[`average${num}` as keyof Student] || ''}
+              name={`semester${num}Avg`}
+              value={formData[`semester${num}Avg` as keyof Student] || ''}
               onChange={handleChange}
               step="0.01"
               min="0"
@@ -86,6 +99,25 @@ export default function StudentForm({ onSubmit, initialData }: StudentFormProps)
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               required
             />
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        {formData.choices?.map((choice, index) => (
+          <div key={index} className="flex items-center">
+            <label className="mr-2">Choice {index + 1}:</label>
+            <select
+              value={choice}
+              onChange={(e) => handleChoiceChange(index, e.target.value)}
+            >
+              <option value="">Select a specialty</option>
+              {specs.map((spec) => (
+                <option key={spec.id} value={spec.id}>
+                  {spec.name}
+                </option>
+              ))}
+            </select>
           </div>
         ))}
       </div>

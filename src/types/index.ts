@@ -3,19 +3,26 @@ export interface Student {
   firstName: string;
   lastName: string;
   studentNumber: string;
-  average1: number;
-  average2: number;
-  average3: number;
-  average4: number;
-  choice1?: string;
-  choice2?: string;
-  choice3?: string;
-  choice4?: string;
-  assignedSpecialty?: string | null;
+  semester1Avg: number;
+  semester2Avg: number;
+  semester3Avg: number;
+  semester4Avg: number;
+  overallAverage: number;
+  choices?: string[];
+  assignedChoice?: string | null;
 }
 
-export interface Specialty {
+export interface Spec {
   id?: number;
   name: string;
-  availableSpots: number;
+  availablePlaces: number;
+  choices?: string[]
+}
+
+
+export interface Choice {
+    id?: number,
+    student: Student,
+    spec: Spec,
+    choiceOrder: number
 }

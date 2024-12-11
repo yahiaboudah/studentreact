@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { fetchStudents, fetchSpecialties } from '../api';
-import { Student, Specialty } from '../types';
+import { fetchStudents, fetchSpecs } from '../api';
+import { Student, Spec } from '../types';
 import Layout from '../components/common/Layout';
 import FinalResults from '../components/FinalResults';
 import { assignSpecialties } from '../utils/calculations';
 
 export default function Results() {
   const [students, setStudents] = useState<Student[]>([]);
-  const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [specialties, setSpecialties] = useState<Spec[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +16,7 @@ export default function Results() {
       try {
         const [studentsData, specialtiesData] = await Promise.all([
           fetchStudents(),
-          fetchSpecialties()
+          fetchSpecs()
         ]);
         
         const assignedStudents = assignSpecialties(studentsData, specialtiesData);
