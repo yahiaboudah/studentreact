@@ -5,6 +5,7 @@ import Layout from '../components/common/Layout';
 import StudentTable from '../components/StudentTable';
 import StudentForm from '../components/students/StudentForm';
 
+
 import toast, { Toaster } from 'react-hot-toast';
 
 export default function Students() {
@@ -113,6 +114,7 @@ export default function Students() {
     setSelectedStudent(null);
   }
 
+
   if (loading) return <Layout><div className="p-4">Loading...</div></Layout>;
   if (error) return <Layout><div className="p-4 text-red-600">{error}</div></Layout>;
 
@@ -122,6 +124,7 @@ export default function Students() {
         
           <h1 className="text-2xl font-bold text-gray-900">Student Management</h1>
           <div className="flex justify-end space-x-4 items-center">
+
             <button 
               className='bg-orange-600 text-white px-4 py-2 rounded-md hover:bg-orange-700'
               onClick={()=>{
