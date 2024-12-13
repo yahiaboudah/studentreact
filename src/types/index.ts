@@ -8,8 +8,9 @@ export interface Student {
   semester3Avg: number;
   semester4Avg: number;
   overallAverage: number;
-  choices?: string[];
-  assignedChoice?: string | null;
+  choices?: object[];
+  choicesList: string[],
+  assignedSpec?: Spec | null;
 }
 
 export interface Spec {

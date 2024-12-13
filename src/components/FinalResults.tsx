@@ -7,11 +7,6 @@ interface FinalResultsProps {
 }
 
 export default function FinalResults({ students }: FinalResultsProps) {
-  const sortedStudents = [...students].sort((a, b) => {
-    const avgA = calculateOverallAverage(a.average1, a.average2, a.average3, a.average4);
-    const avgB = calculateOverallAverage(b.average1, b.average2, b.average3, b.average4);
-    return avgB - avgA;
-  });
 
   return (
     <div className="overflow-x-auto">
@@ -33,7 +28,7 @@ export default function FinalResults({ students }: FinalResultsProps) {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {sortedStudents.map((student, index) => (
+          {students.map((student, index) => (
             <tr key={student.id}>
               <td className="px-6 py-4 whitespace-nowrap">
                 {index + 1}
@@ -42,15 +37,10 @@ export default function FinalResults({ students }: FinalResultsProps) {
                 {student.firstName} {student.lastName}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {calculateOverallAverage(
-                  student.average1,
-                  student.average2,
-                  student.average3,
-                  student.average4
-                ).toFixed(2)}
+                {student.overallAverage}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {student.assignedSpecialty || 'Not assigned'}
+                {student.assignedSpec?.name || '-'}
               </td>
             </tr>
           ))}

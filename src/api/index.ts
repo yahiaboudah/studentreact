@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Student, Spec, Choice } from '../types';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'http://localhost:8081/api';
 
 export const fetchStudents = async (): Promise<Student[]> => {
   const response = await axios.get(`${API_BASE_URL}/student`);
@@ -54,3 +54,35 @@ export const fetchChoicesByStudentId = async (studentId: number): Promise<Choice
 export const deleteAllChoicesByStudentId = async (studentId: number): Promise<void> => {
     await axios.delete(`${API_BASE_URL}/choices/student/${studentId}`);
 };
+
+export const refreshChoices = async(): Promise<Boolean> => {
+  const response = await axios.get(`${API_BASE_URL}/choices/refresh`);
+  return response.data;
+}
+
+export const assignSpecs = async(): Promise<Boolean> => {
+  const response = await axios.get(`${API_BASE_URL}/choices/assign`);
+  return response.data;
+}
+
+export const searchStudentsByAll = async(firstName, lastName, number): Promise<Student[]> => {
+
+  const response = await axios.get(`${API_BASE_URL}/student/fullSearch`, {
+    params: {
+      firstName: firstName || undefined,
+      lastName: lastName || undefined,
+      number: number || undefined
+    }
+  });
+  return response.data;
+}
+
+export const searchSpecs = async(specName): Promise<Spec[]> => {
+  const response = await axios.get(`${API_BASE_URL}/spec/search`, {
+    params: {
+      name: specName || undefined
+    }
+  });
+
+  return response.data;
+}

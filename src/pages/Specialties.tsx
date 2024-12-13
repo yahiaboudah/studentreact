@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { fetchSpecs, updateSpec, deleteSpec, createSpec } from '../api';
+import { fetchSpecs, updateSpec, deleteSpec, createSpec, searchSpecs } from '../api';
 import { Spec } from '../types';
 import Layout from '../components/common/Layout';
 import SpecialtyTable from '../components/SpecialtyTable';
@@ -13,6 +13,7 @@ export default function Specialties() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [specName, setSpecName] = useState('');
 
   useEffect(() => {
     loadSpecialties();
@@ -34,6 +35,16 @@ export default function Specialties() {
     setSelectedSpec(spec);
     setShowForm(true);
   };
+  
+  const searchSpecsFunc = async () => {
+    try {
+      let data = await searchSpecs(specName);
+      setSpecs(data);
+    }
+    catch(err) {
+      toast.error("Could not search specialties!");
+    }
+  }
 
   const handleSubmit = async (specData: Partial<Spec>, createNew) => {
     try {
@@ -83,6 +94,21 @@ export default function Specialties() {
         {showForm && (
           <SpecialtyForm onSubmit={handleSubmit} initialData={selectedSpec || undefined} />
         )}
+
+        <div className="search-bar flex justify-start space-x-5">
+            
+            <input
+                type="text"
+                className='rounded-md px-4 py-1'
+                placeholder="Name"
+                value={specName}
+                onChange={(e) => setSpecName(e.target.value)}
+            />
+
+            <div className='flex-grow'></div>
+            <button className='text-white bg-red-400 rounded-md px-4 py-1 self-end' onClick={searchSpecsFunc}>Search ⌕</button>
+          
+        </div>
 
         <SpecialtyTable 
             specs={specialties}

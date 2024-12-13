@@ -2,15 +2,19 @@ import React, { useEffect, useState } from 'react';
 import { Student, Spec } from '../../types';
 import { fetchSpecs } from '../../api';
 
+import toast, { Toaster } from 'react-hot-toast';
+
+import { ShieldCloseIcon } from 'lucide-react'
+
 interface StudentFormProps {
   onSubmit: (student: Partial<Student>) => void;
-  specs: Spec[]
+  onClose: ()=>void;
+  specs: Spec[];
   initialData?: Student;
 }
 
-export default function StudentForm({ onSubmit, initialData, specs }: StudentFormProps) {
-  
-  const [formData, setFormData] = useState<Partial<Student>>(
+export default function StudentForm({ onSubmit, onClose, initialData, specs }) {
+  const [formData, setFormData] = useState(
     initialData || {
       firstName: '',
       lastName: '',
@@ -19,34 +23,55 @@ export default function StudentForm({ onSubmit, initialData, specs }: StudentFor
       semester2Avg: 0,
       semester3Avg: 0,
       semester4Avg: 0,
-      choices: []
+      choices: [],
+      choicesList: []
     }
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    if((new Set(formData.choicesList)).size != formData.choicesList.length) {
+      toast.error("There is a duplicate specialty!");
+      return;
+    }
+    if(formData.choicesList.filter(x=>x=='').length > 0) {
+      toast.error("Please select all specialty choices!");
+      return;
+    }
+    onSubmit(formData, initialData ? false: true);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: name.includes('semester') ? parseFloat(value) : value
     }));
   };
 
-  const handleChoiceChange = (index: number, value: string) => {
-    const updatedChoices = [...(formData.choices || [])];
-    updatedChoices[index] = value;
-    setFormData(prev => ({
+  const handleChoiceChange = (index, value) => {
+    // const updatedChoices = [...(formData.choices || [])];
+    const updatedChoicesList = [...(formData.choicesList || [])];
+
+    // Update both choices and choicesList
+    // updatedChoices[index] = specs.find((spec) => spec.id === value) || null;
+    updatedChoicesList[index] = value;
+
+    setFormData((prev) => ({
       ...prev,
-      choices: updatedChoices
+      // choices: updatedChoices,
+      choicesList: updatedChoicesList
     }));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow">
+    <form onSubmit={handleSubmit} className="relative space-y-4 items-center justify-items-end bg-white p-6 rounded-lg shadow">
+      <Toaster/>
+      <ShieldCloseIcon
+        className="absolute top-2 right-2 mr-8 text-gray-500 cursor-pointer transition-transform transform hover:text-red-500 scale-150 hover:scale-200"
+        onClick={onClose}
+      />
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">First Name</label>
@@ -91,7 +116,7 @@ export default function StudentForm({ onSubmit, initialData, specs }: StudentFor
             <input
               type="number"
               name={`semester${num}Avg`}
-              value={formData[`semester${num}Avg` as keyof Student] || ''}
+              value={formData[`semester${num}Avg`] || ''}
               onChange={handleChange}
               step="0.01"
               min="0"
@@ -103,20 +128,34 @@ export default function StudentForm({ onSubmit, initialData, specs }: StudentFor
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
-        {formData.choices?.map((choice, index) => (
+      <div className="grid grid-cols-2 gap-4">
+        {(formData.choices.length > 0 ? formData.choices: specs).map((ch, index) => (
           <div key={index} className="flex items-center">
             <label className="mr-2">Choice {index + 1}:</label>
             <select
-              value={choice}
+              className="px-4 py-2 bg-slate-50 rounded-2xl border-2 border-lime-600"
+              value={formData.choicesList[index] || ''}
               onChange={(e) => handleChoiceChange(index, e.target.value)}
             >
               <option value="">Select a specialty</option>
-              {specs.map((spec) => (
-                <option key={spec.id} value={spec.id}>
-                  {spec.name}
-                </option>
-              ))}
+              {ch.hasOwnProperty('spec')? (
+                <>
+                  <option key={ch.spec.id} value={ch.spec.name}>
+                    {ch.spec.name}
+                  </option>
+                  {specs.filter(s=>s.name !=ch.spec.name).map((ss)=>(
+                    <option key={ss.id} value={ss.name}>
+                      {ss.name}
+                    </option>
+                  ))}
+                </>
+              ):(
+                specs.map((spec) => (
+                  <option key={spec.id} value={spec.name}>
+                    {spec.name}
+                  </option>
+                ))
+              )}
             </select>
           </div>
         ))}

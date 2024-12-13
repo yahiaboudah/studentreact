@@ -48,6 +48,11 @@ export default function StudentTable({
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Overall Average
             </th>
+
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Assigned
+            </th>
+
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
             </th>
@@ -75,10 +80,27 @@ export default function StudentTable({
                 {student.semester4Avg}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
-                {student.choices?.join(' | ')}
+                <span style={{ color: 'orange' }}>{'['}</span>
+                {student.choices
+                    ?.sort((a:any,b:any)=>{return a.choiceOrder - b.choiceOrder})
+                    ?.map((c) => c['spec']['name'])
+                    ?.join(' | ')
+                    .split(' | ')
+                    .map((part, index, array) => (
+                      <span>
+                        <span key={index}>
+                          {part}
+                          {index < array.length - 1 && <span style={{ color: 'orange' }}> {']['} </span>}
+                        </span>
+                      </span>
+                    ))}
+                <span style={{ color: 'orange' }}>{']'}</span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 {student.overallAverage}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                {student.assignedSpec?.name ? '*' + student.assignedSpec?.name + '*' : 'N/A'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex space-x-2">
